@@ -1,0 +1,15 @@
+{
+  "version": "1.0.0",
+  "updated_at": "2026-04-06T20:04:23.749Z",
+  "packs": [
+    {
+      "id": "java-backend",
+      "org": "Ingenia",
+      "role": "dev-backend",
+      "version": "1.0.0",
+      "path": "Ingenia/java-backend",
+      "description": "Pack de skills",
+      "tags": []
+    }
+  ]
+}

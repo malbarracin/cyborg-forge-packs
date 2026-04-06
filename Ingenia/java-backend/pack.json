@@ -1,0 +1,18 @@
+{
+  "id": "java-backend",
+  "org": "Ingenia",
+  "role": "dev-backend",
+  "display_name": "Ingenia/java-backend",
+  "version": "1.0.0",
+  "description": "Pack de skills",
+  "tags": [],
+  "extends": null,
+  "overrides": [],
+  "adds": [],
+  "ide_targets": [
+    "cursor"
+  ],
+  "author": "Marcelo Albarracin <marcelo.albarracin@ingenia.la> — Ingenia",
+  "created_at": "2026-04-06T20:04:22.610Z",
+  "updated_at": "2026-04-06T20:04:23.748Z"
+}
