@@ -1,0 +1,16 @@
+---
+description: "Política de cambios: mínimo impacto, no reestructurar sin permiso"
+globs: ["**/*"]
+alwaysApply: true
+---
+
+# CHANGE POLICY
+- No reestructurar carpetas.
+- No renombrar paquetes.
+- No cambiar arquitectura.
+- Cambios mínimos para cumplir la feature.
+
+Si el usuario pide un cambio puntual:
+- tocar lo mínimo
+- explicar por qué se toca cada archivo
+- no "aprovechar" para refactor masivo sin pedir permiso

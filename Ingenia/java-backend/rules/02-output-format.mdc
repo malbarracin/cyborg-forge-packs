@@ -1,0 +1,111 @@
+---
+description: "Formato de salida profesional (Plan -> Execute -> Handoff)"
+globs: ["**/*"]
+alwaysApply: true
+---
+
+# OUTPUT FORMAT (SIEMPRE)
+
+## PLAN
+- Etapas (Architect/Scaffold/Build/Test/Docs/Review/Release)
+- Archivos a crear/modificar
+- Riesgos/Puntos críticos
+- Checklist de aceptación
+
+## EXECUTION
+- Qué se hizo por etapa (resumen breve)
+
+## CHANGES
+- Lista de archivos creados/modificados (paths)
+
+## RULES_APPLIED
+- Lista de reglas que se aplicaron durante la ejecución
+- Formato: `[rule-id] rule-name - breve descripción de cómo se aplicó`
+- Ejemplo:
+  - `[10-stack] Stack obligatorio - Java 21, Spring Boot 3.3.x, MongoDB`
+  - `[11-architecture] Arquitectura MVC - Controller/Service/Repository/Entity/DTO/Mapper`
+  - `[22-java-best-practices] Null safety - Optional en findById`
+  - `[24-logging-traceability] Logging multi-nivel - @Slf4j en todas las clases`
+
+## STATS (OBLIGATORIO - NO OMITIR)
+
+⚠️ **SIEMPRE generar esta sección con datos reales, NUNCA omitirla.**
+
+### 1. Distribución de reglas por categoría (pie chart)
+
+Contar cuántas reglas de cada categoría se aplicaron y generar:
+
+```mermaid
+pie showData title Reglas aplicadas por categoría
+    "Core (01-09)" : X
+    "Stack & Arch (10-19)" : X
+    "Code Quality (20-29)" : X
+    "Dependencies (30-39)" : X
+    "Quality Gates (40-49)" : X
+    "API & Docs (50-59)" : X
+    "Git & Release (60-69)" : X
+```
+
+### 2. Archivos por tipo (bar chart)
+
+Contar archivos creados/modificados por tipo:
+
+```mermaid
+xychart-beta
+    title "Archivos creados/modificados"
+    x-axis [Controllers, Services, Repos, Entities, DTOs, Mappers, Tests, Config]
+    y-axis "Cantidad" 0 --> 10
+    bar [X, X, X, X, X, X, X, X]
+```
+
+### 3. Resumen numérico (OBLIGATORIO)
+
+| Métrica | Valor |
+|---------|-------|
+| Total reglas aplicadas | X |
+| Archivos creados | X |
+| Archivos modificados | X |
+| Tests agregados | X |
+| Endpoints documentados | X |
+| Coverage final | X% |
+
+**IMPORTANTE:** Reemplazar todas las "X" con valores reales contados durante la ejecución.
+
+## RUNBOOK
+- Comandos para:
+  - docker compose up/down
+  - run app
+  - run tests
+  - curl ejemplos
+
+## HANDOFF
+- Estado: READY | PAUSED_WAITING_USER
+- Qué falta (si aplica)
+- Próximo paso
+
+## DELIVERY STRUCTURE
+
+Los entregables se organizan por feature:
+
+```
+delivery/
+├── features/
+│   └── [NN]-[feature-name]/     ← Carpeta por feature
+│       ├── dod.md               ← Definition of Done
+│       ├── handoff.md           ← Handoff document
+│       └── pr.md                ← Pull Request description
+├── stats/
+│   ├── index.html               ← Dashboard acumulativo (se actualiza)
+│   ├── stats.json               ← Datos JSON (se actualiza)
+│   └── history.md               ← Historial (se actualiza)
+├── coverage-report.html         ← Reporte coverage (se actualiza)
+└── release-commands.md          ← Comandos release (se actualiza)
+```
+
+**Reglas:**
+- Cada feature crea su propia carpeta en `delivery/features/`
+- El nombre de carpeta sigue el patrón: `[NN]-[feature-slug]`
+  - NN = número secuencial (01, 02, 03...)
+  - feature-slug = nombre corto en kebab-case
+- Los archivos compartidos (stats, coverage, release-commands) se actualizan en su lugar
+- NUNCA sobrescribir carpetas de features anteriores

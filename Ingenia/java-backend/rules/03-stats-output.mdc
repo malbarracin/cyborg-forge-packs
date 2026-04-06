@@ -1,0 +1,250 @@
+---
+description: "Estadísticas acumulativas y dashboard obligatorio"
+globs: ["**/*"]
+alwaysApply: true
+---
+
+# STATS OUTPUT (OBLIGATORIO - ACUMULATIVO)
+
+Esta regla es **OBLIGATORIA** y debe aplicarse al final de **CADA** ejecución del cyborg.
+
+## ⛔ PROHIBICIONES ABSOLUTAS
+
+```
+❌ PROHIBIDO: Generar HTML propio para el dashboard
+❌ PROHIBIDO: Crear estilos CSS diferentes al template
+❌ PROHIBIDO: Inventar estructura HTML diferente
+❌ PROHIBIDO: Omitir el JavaScript del template
+❌ PROHIBIDO: Generar un dashboard "simplificado"
+❌ PROHIBIDO: Modificar index.html si output.dashboard=false
+```
+
+## ✅ OBLIGATORIO
+
+```
+✅ OBLIGATORIO: Usar EXACTAMENTE el template stats-dashboard.template.html
+✅ OBLIGATORIO: Copiar el template COMPLETO (~485 líneas)
+✅ OBLIGATORIO: Solo reemplazar los placeholders listados
+✅ OBLIGATORIO: Incluir el JSON completo en {{STATS_DATA_JSON}}
+✅ OBLIGATORIO: El archivo final debe tener las funciones generateFeatureDetails() y generateTopRules()
+```
+
+---
+
+## Estructura de archivos
+
+```
+delivery/
+└── stats/
+    ├── index.html      ← Dashboard HTML (SOLO del template)
+    ├── stats.json      ← Datos acumulados (JSON)
+    └── history.md      ← Historial legible (Markdown)
+```
+
+---
+
+## Proceso de ejecución
+
+### Paso 1: Contar reglas y archivos
+
+1. Listar TODAS las reglas aplicadas durante la ejecución
+2. Contar archivos creados/modificados por tipo
+3. Calcular duración de la feature
+
+### Paso 2: APPEND al historial (history.md)
+
+**NO SOBRESCRIBIR**. Agregar nueva sección al final.
+
+### Paso 3: UPDATE stats.json
+
+Agregar la nueva feature al array `features`. **IMPORTANTE:** Incluir `folderSlug`:
+
+```json
+{
+  "features": [
+    {
+      "id": 1,
+      "name": "CRUD de usuarios",
+      "folderSlug": "crud-usuarios",
+      "input": "01-users-basic-crud.input.md",
+      "date": "2026-02-10",
+      "mode": "CREATE_FROM_ZERO",
+      "filesCreated": 24,
+      "filesModified": 0,
+      "durationMinutes": 15,
+      "durationFormatted": "15 min",
+      "rules": ["01-core", "02-output-format", "10-stack", "..."]
+    }
+  ],
+  "ruleStats": {
+    "byCategory": {
+      "Core (01-09)": 8,
+      "Stack & Arch (10-19)": 13,
+      "Code Quality (20-29)": 16,
+      "Dependencies (30-39)": 1,
+      "Quality Gates (40-49)": 9,
+      "API & Docs (50-59)": 8,
+      "Git & Release (60-69)": 4
+    }
+  },
+  "fileStats": {
+    "byType": {
+      "Java": 29,
+      "XML": 1,
+      "YAML": 5,
+      "Markdown": 11
+    }
+  }
+}
+```
+
+---
+
+## Paso 4: REGENERAR index.html (CRÍTICO)
+
+### Si output.dashboard = false
+
+```
+❌ NO tocar delivery/stats/index.html
+❌ NO escribir nada
+✅ Saltar al Paso 5
+```
+
+### Si output.dashboard = true (default)
+
+**⚠️ PROCESO OBLIGATORIO - NO HAY ALTERNATIVA:**
+
+```
+1. LEER el archivo .cursor/templates/stats-dashboard.template.html COMPLETO
+2. COPIAR todo el contenido del template (las ~485 líneas completas)
+3. REEMPLAZAR SOLO estos placeholders:
+   - {{PROJECT_NAME}} → nombre del proyecto
+   - {{GENERATED_DATE}} → fecha actual
+   - {{ARCHITECTURE}} → MVC o Hexagonal
+   - {{TOTAL_FEATURES}} → número
+   - {{TOTAL_TIME}} → "X min"
+   - {{TOTAL_FILES}} → número
+   - {{TOTAL_RULES}} → número
+   - {{FEATURES_TABLE_ROWS}} → filas HTML de la tabla
+   - {{STATS_DATA_JSON}} → JSON COMPLETO de stats.json
+4. ESCRIBIR el resultado en delivery/stats/index.html
+5. VERIFICAR que el archivo tiene ~485+ líneas
+```
+
+### Placeholder {{FEATURES_TABLE_ROWS}}
+
+Generar UNA fila por feature:
+
+```html
+<tr>
+    <td>1</td>
+    <td><a href="../features/01-crud-usuarios/" style="color: var(--primary); text-decoration: none; font-weight: 500;">CRUD de usuarios</a> <span style="font-size: 11px; color: var(--text-secondary); margin-left: 8px;">📁</span></td>
+    <td>2026-02-10</td>
+    <td>15 min</td>
+    <td>24</td>
+    <td>17</td>
+</tr>
+```
+
+### Placeholder {{STATS_DATA_JSON}}
+
+Insertar el JSON COMPLETO de stats.json. El JavaScript del template usa este JSON para:
+- Generar las cards expandibles por feature
+- Generar los links a documentos (dod.md, handoff.md, pr.md)
+- Generar las tablas de reglas por feature
+- Generar los gráficos individuales
+- Generar el Top 10 de reglas
+
+---
+
+## ⚠️ VERIFICACIÓN OBLIGATORIA
+
+Después de escribir index.html, verificar:
+
+```
+✅ El archivo tiene ~485+ líneas (NO menos de 400)
+✅ Contiene la función generateFeatureDetails()
+✅ Contiene la función generateTopRules()
+✅ Contiene la función toggleFeature()
+✅ Contiene "const statsData = {"
+✅ NO contiene placeholders sin reemplazar (buscar "{{")
+✅ El JSON en statsData tiene todas las features con sus arrays "rules"
+```
+
+**Si el archivo tiene menos de 400 líneas, ESTÁ MAL. Volver a generarlo.**
+
+---
+
+## Categorías de reglas
+
+| Categoría | Rango | Reglas incluidas |
+|-----------|-------|------------------|
+| Core | 01-09 | 01-core, 02-output-format, 03-stats-output, 04-multi-agent, 05-input-validation |
+| Stack & Arch | 10-19 | 10-stack, 11-architecture-*, 12-gitignore, 13-error-contract, 14-docker, 15-actuator, 16-kubernetes, 17-api-versioning |
+| Code Quality | 20-29 | 20-java-code-style, 21-import-hygiene, 22-best-practices, 23-dead-code, 24-logging |
+| Dependencies | 30-39 | 30-maven-dependency-hygiene |
+| Quality Gates | 40-49 | 40-quality-gates, 41-jacoco, 42-runtime-safe |
+| API & Docs | 50-59 | 50-swagger, 51-postman, 55-performance-testing |
+| Git & Release | 60-69 | 60-git-automation |
+
+---
+
+## Validación final
+
+El cyborg **NO puede cerrar como DONE** si:
+
+- No existe delivery/stats/
+- history.md no tiene la nueva feature
+- stats.json no está actualizado con folderSlug
+- **Si output.dashboard=true:** index.html tiene menos de 400 líneas
+- **Si output.dashboard=true:** index.html no tiene generateFeatureDetails()
+- **Si output.dashboard=false:** index.html fue modificado
+
+---
+
+## Ejemplo de ERROR vs CORRECTO
+
+### ❌ ERROR: Dashboard simplificado (NO HACER)
+
+```html
+<!DOCTYPE html>
+<html>
+<head><title>Stats</title></head>
+<body>
+    <h1>Features: 4</h1>
+    <p>Total time: 42 min</p>
+    <!-- ESTO ESTÁ MAL - Falta todo el JavaScript -->
+</body>
+</html>
+```
+
+### ✅ CORRECTO: Dashboard del template
+
+```html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Cyborg Stats Dashboard - user-service</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root { --primary: #2563eb; ... }
+        /* ~120 líneas de CSS */
+    </style>
+</head>
+<body>
+    <!-- ~150 líneas de HTML estructura -->
+    <script>
+        const statsData = { /* JSON completo */ };
+        /* ~200 líneas de JavaScript incluyendo:
+           - generateFeatureDetails()
+           - generateTopRules()
+           - toggleFeature()
+           - Chart.js initialization
+        */
+    </script>
+</body>
+</html>
+```
+
+**El archivo correcto tiene ~485 líneas. Si tiene menos de 400, está mal.**
